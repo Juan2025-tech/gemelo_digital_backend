@@ -1,27 +1,38 @@
 from flask import Blueprint, jsonify
-import pandas as pd
 import json
 import os
 from flask_cors import cross_origin
 
 iot_data_bp = Blueprint('iot_data', __name__)
 
+# Datos simulados en memoria para evitar dependencias externas
+SIMULATED_DATA = [
+    {"timestamp": "2025-08-30T00:00:00", "temperatura_celsius": 38.2, "frecuencia_cardiaca_lpm": 95},
+    {"timestamp": "2025-08-30T00:05:00", "temperatura_celsius": 38.1, "frecuencia_cardiaca_lpm": 92},
+    {"timestamp": "2025-08-30T00:10:00", "temperatura_celsius": 38.3, "frecuencia_cardiaca_lpm": 98},
+    {"timestamp": "2025-08-30T00:15:00", "temperatura_celsius": 38.0, "frecuencia_cardiaca_lpm": 89},
+    {"timestamp": "2025-08-30T00:20:00", "temperatura_celsius": 38.4, "frecuencia_cardiaca_lpm": 101},
+    {"timestamp": "2025-08-30T06:00:00", "temperatura_celsius": 39.8, "frecuencia_cardiaca_lpm": 105},  # Fiebre
+    {"timestamp": "2025-08-30T06:05:00", "temperatura_celsius": 40.2, "frecuencia_cardiaca_lpm": 108},  # Fiebre
+    {"timestamp": "2025-08-30T06:10:00", "temperatura_celsius": 40.0, "frecuencia_cardiaca_lpm": 110},  # Fiebre
+    {"timestamp": "2025-08-30T14:00:00", "temperatura_celsius": 38.5, "frecuencia_cardiaca_lpm": 135},  # Taquicardia
+    {"timestamp": "2025-08-30T14:05:00", "temperatura_celsius": 38.3, "frecuencia_cardiaca_lpm": 142},  # Taquicardia
+    {"timestamp": "2025-08-30T14:10:00", "temperatura_celsius": 38.4, "frecuencia_cardiaca_lpm": 138},  # Taquicardia
+    {"timestamp": "2025-08-30T20:00:00", "temperatura_celsius": 40.5, "frecuencia_cardiaca_lpm": 155},  # Fiebre + Taquicardia
+    {"timestamp": "2025-08-30T20:05:00", "temperatura_celsius": 40.8, "frecuencia_cardiaca_lpm": 162},  # Fiebre + Taquicardia
+    {"timestamp": "2025-08-30T20:10:00", "temperatura_celsius": 40.3, "frecuencia_cardiaca_lpm": 158},  # Fiebre + Taquicardia
+    {"timestamp": "2025-08-30T23:55:00", "temperatura_celsius": 38.6, "frecuencia_cardiaca_lpm": 96},   # Vuelta a normal
+]
+
 @iot_data_bp.route('/data', methods=['GET'])
 @cross_origin()
 def get_all_data():
     """Obtener todos los datos simulados del animal"""
     try:
-        # Leer el archivo CSV con los datos simulados
-        csv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'datos_simulados_animal.csv')
-        df = pd.read_csv(csv_path)
-        
-        # Convertir a formato JSON
-        data = df.to_dict('records')
-        
         return jsonify({
             'success': True,
-            'data': data,
-            'total_records': len(data)
+            'data': SIMULATED_DATA,
+            'total_records': len(SIMULATED_DATA)
         })
     except Exception as e:
         return jsonify({
@@ -34,12 +45,7 @@ def get_all_data():
 def get_latest_data():
     """Obtener los últimos datos del animal"""
     try:
-        csv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'datos_simulados_animal.csv')
-        df = pd.read_csv(csv_path)
-        
-        # Obtener el último registro
-        latest_data = df.iloc[-1].to_dict()
-        
+        latest_data = SIMULATED_DATA[-1]
         return jsonify({
             'success': True,
             'data': latest_data
@@ -55,23 +61,20 @@ def get_latest_data():
 def get_anomalies():
     """Detectar y devolver anomalías en los datos"""
     try:
-        csv_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'datos_simulados_animal.csv')
-        df = pd.read_csv(csv_path)
-        
         # Definir rangos normales
         temp_normal_min, temp_normal_max = 37.5, 39.2
         fc_normal_min, fc_normal_max = 70, 120
         
         # Detectar anomalías
         anomalies = []
-        for index, row in df.iterrows():
-            temp = row['temperatura_celsius']
-            fc = row['frecuencia_cardiaca_lpm']
+        for data_point in SIMULATED_DATA:
+            temp = data_point['temperatura_celsius']
+            fc = data_point['frecuencia_cardiaca_lpm']
             
             if temp < temp_normal_min or temp > temp_normal_max:
                 anomaly_type = 'Hipotermia' if temp < temp_normal_min else 'Fiebre'
                 anomalies.append({
-                    'timestamp': row['timestamp'],
+                    'timestamp': data_point['timestamp'],
                     'type': 'Temperatura',
                     'subtype': anomaly_type,
                     'value': temp,
@@ -81,7 +84,7 @@ def get_anomalies():
             if fc < fc_normal_min or fc > fc_normal_max:
                 anomaly_type = 'Bradicardia' if fc < fc_normal_min else 'Taquicardia'
                 anomalies.append({
-                    'timestamp': row['timestamp'],
+                    'timestamp': data_point['timestamp'],
                     'type': 'Frecuencia Cardíaca',
                     'subtype': anomaly_type,
                     'value': fc,
