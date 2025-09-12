@@ -20,7 +20,7 @@ def generate_random_data_point():
         fc = random.randint(130, 180)
     else:
         fc = random.randint(fc_min, fc_max)
-    timestamp = datetime.now().isoformat(timespec=\'seconds\')
+    timestamp = datetime.now().isoformat(timespec='seconds')
     return {
         "timestamp": timestamp,
         "temperatura_celsius": temp,
@@ -77,7 +77,7 @@ def get_device_status():
             "online": True,
             "battery_level": 85,
             "signal_strength": "Strong",
-            "last_update": datetime.now().isoformat(timespec=\'seconds\') + \'Z\',
+            "last_update": datetime.now().isoformat(timespec='seconds') + 'Z',
             "device_id": "IOT_ANIMAL_001"
         }
     })
