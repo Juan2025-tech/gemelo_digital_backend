@@ -6,7 +6,7 @@ from datetime import datetime
 app = Flask(__name__)
 
 CORS(app,
-     resources={r"/*": {"origins": "*"}},
+     resources={r"/*": {"origins": "https://gemelodigitalanimal.netlify.app"}},
      supports_credentials=True,
      methods=["GET", "POST", "OPTIONS"],
      allow_headers=["Content-Type", "Authorization"])
