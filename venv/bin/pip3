@@ -1,4 +1,6 @@
-#!/home/ubuntu/gemelo_digital_backend/venv/bin/python3.11
+#!/bin/sh
+'''exec' "/Users/walterperezherrera/Documents/2025/Documentos Domowallen/Proyectos tecnológicos/Tecnologías para crear gemelos digitales en dispositivos IoT/gemelo_digital_backend/venv/bin/python3.13" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys
