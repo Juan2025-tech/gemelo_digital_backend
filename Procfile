@@ -1,2 +1,3 @@
-web: python3 src/main.py
+web: gunicorn -w 4 -b 0.0.0.0:5000 src.main:app
+
 

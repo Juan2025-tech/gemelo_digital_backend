@@ -4,7 +4,12 @@ import random
 from datetime import datetime
 
 app = Flask(__name__)
-CORS(app)
+
+CORS(app,
+     resources={r"/*": {"origins": "*"}},
+     supports_credentials=True,
+     methods=["GET", "POST", "OPTIONS"],
+     allow_headers=["Content-Type", "Authorization"])
 
 DATA_HISTORY = []
 MAX_HISTORY_SIZE = 50
@@ -83,6 +88,6 @@ def get_device_status():
     })
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=True)
 
 
